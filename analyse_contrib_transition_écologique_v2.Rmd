@@ -1,0 +1,489 @@
+---
+title: "Analyse des contributions du Grand Débat National sur la transition écologique"
+author: ""
+date: "21 février 2019"
+output: 
+  html_document:
+    theme: cosmo
+---
+
+```{r setup, include=FALSE,  message=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(comment = NA)
+require(knitr)
+require(dplyr)
+require(metricsgraphics)
+require(tidytext)
+require(tidyverse)
+require(stopwords)
+require(tm)
+require(qdapTools)
+require(igraph)
+require(ggplot2)
+require(sp)
+require(cartography)
+```
+
+```{r loadata, echo=FALSE, cache= FALSE,  message=FALSE}
+setwd("C:/Users/stephane.trainel/Documents/Developpements/granddebat-contrib/")
+#source("loaddata.R", encoding = "UTF-8")
+load(file = "data2.Rdata")
+load(file = "dep.Rdata")
+```
+
+
+## Premiers chiffres
+
+Nombre de contributions 
+```{r nbcontrib, echo=FALSE}
+as.numeric(count(data))
+```
+
+```{r nbtypeauthor, echo=FALSE}
+dt <- data %>% count (authorType)
+dt$pct <- round(dt$n / sum(dt$n) * 100,2)
+kable(dt, caption = "Type de contributeur")
+```
+
+```{r nbdep, echo=FALSE, fig.height = 8, fig.width = 8}
+dt <- data %>% count (dep)
+dt$pct <- round(dt$n / sum(dt$n) * 100,2)
+plot(dep)
+choroLayer(spdf = dep, df = dt, spdfid = "CODE_DEPT", 
+           dfid = "dep", var = "n", border = NA, 
+           col = carto.pal("wine.pal", 6), legend.pos = "topleft", 
+           add = TRUE, method = "geom", nclass = 6, legend.title.txt = "Contribution par département")
+
+```
+
+## Analyse de mots dans la Q1
+
+```{r q1stat, echo=FALSE}
+dt <- data %>% count (Q1F)
+dt$pct <- round(dt$n / sum(dt$n) * 100,2)
+kable(dt, caption = vars2_value[1])
+```
+
+```{r q1stat_topmots, echo=FALSE, warning=FALSE}
+tmq1_temp <- data.frame(word = colnames(tmq1),freq=diag(tmq1))
+tmq1_temp <- tmq1_temp[order(-tmq1_temp$freq),]
+ggplot(tmq1_temp[1:20,], aes(x = reorder(word, -freq), y = freq)) + 
+  geom_bar(stat="identity") + 
+  coord_flip()+
+  xlab("Terme") + 
+  ylab("Fréquence") + 
+  theme_minimal()
+```
+
+
+```{r q1stat_nuagetopmots, echo=FALSE, warning=FALSE, fig.height = 8, fig.width = 8}
+g <- graph.adjacency(tmq1, weighted=T, mode = "undirected")
+g <- simplify(g)
+V(g)$label <- V(g)$name
+V(g)$degree <- degree(g)
+V(g)$label.cex <- 2.2 * V(g)$degree / max(V(g)$degree)+ .2
+V(g)$label.color <- rgb(0, 0, .2, .8)
+V(g)$frame.color <- NA
+egam <- (log(E(g)$weight)+.4) / max(log(E(g)$weight)+.4)
+E(g)$color <- rgb(.5, .5, 0, egam)
+E(g)$width <- egam
+layout1 <- layout.fruchterman.reingold(g)
+set.seed(3952)
+plot(g, layout=layout1, width = 500, height = 500)
+```
+
+## Analyse de mots dans la Q2
+
+```{r q2stat_topmots, echo=FALSE, warning=FALSE}
+vars2_value[2]
+tmq2_temp <- data.frame(word = colnames(tmq2),freq=diag(tmq2))
+tmq2_temp <- tmq2_temp[order(-tmq2_temp$freq),]
+ggplot(tmq2_temp[1:20,], aes(x = reorder(word, -freq), y = freq)) + 
+  geom_bar(stat="identity") + 
+  coord_flip()+
+  xlab("Terme") + 
+  ylab("Fréquence") + 
+  theme_minimal()
+```
+
+
+```{r q2stat_nuagetopmots, echo=FALSE, warning=FALSE, fig.height = 8, fig.width = 8}
+g <- graph.adjacency(tmq2, weighted=T, mode = "undirected")
+g <- simplify(g)
+V(g)$label <- V(g)$name
+V(g)$degree <- degree(g)
+V(g)$label.cex <- 2.2 * V(g)$degree / max(V(g)$degree)+ .2
+V(g)$label.color <- rgb(0, 0, .2, .8)
+V(g)$frame.color <- NA
+egam <- (log(E(g)$weight)+.4) / max(log(E(g)$weight)+.4)
+E(g)$color <- rgb(.5, .5, 0, egam)
+E(g)$width <- egam
+layout1 <- layout.fruchterman.reingold(g)
+set.seed(3952)
+plot(g, layout=layout1, width = 500, height = 500)
+```
+
+
+## Analyse des réponses de la Q3
+
+```{r , echo=FALSE}
+dt <- data %>% count (Q3)
+dt$pct <- round(dt$n / sum(dt$n) * 100,2)
+kable(dt, caption = vars2_value[3])
+```
+
+## Analyse de mots dans la Q4
+
+```{r q4stat_topmots, echo=FALSE, warning=FALSE}
+vars2_value[4]
+tmq4_temp <- data.frame(word = colnames(tmq4),freq=diag(tmq4))
+tmq4_temp <- tmq4_temp[order(-tmq4_temp$freq),]
+ggplot(tmq4_temp[1:20,], aes(x = reorder(word, -freq), y = freq)) + 
+  geom_bar(stat="identity") + 
+  coord_flip()+
+  xlab("Terme") + 
+  ylab("Fréquence") + 
+  theme_minimal()
+```
+
+
+```{r q4stat_nuagetopmots, echo=FALSE, warning=FALSE, fig.height = 8, fig.width = 8}
+g <- graph.adjacency(tmq4, weighted=T, mode = "undirected")
+g <- simplify(g)
+V(g)$label <- V(g)$name
+V(g)$degree <- degree(g)
+V(g)$label.cex <- 2.2 * V(g)$degree / max(V(g)$degree)+ .2
+V(g)$label.color <- rgb(0, 0, .2, .8)
+V(g)$frame.color <- NA
+egam <- (log(E(g)$weight)+.4) / max(log(E(g)$weight)+.4)
+E(g)$color <- rgb(.5, .5, 0, egam)
+E(g)$width <- egam
+layout1 <- layout.fruchterman.reingold(g)
+set.seed(3952)
+plot(g, layout=layout1, width = 500, height = 500)
+```
+
+
+
+## Analyse des réponses de la Q5
+
+```{r , echo=FALSE}
+dt <- data %>% count (Q5)
+dt$pct <- round(dt$n / sum(dt$n) * 100,2)
+kable(dt, caption = vars2_value[5])
+```
+
+
+## Analyse de mots dans la Q6
+
+```{r q6stat_topmots, echo=FALSE, warning=FALSE}
+vars2_value[6]
+tmq6_temp <- data.frame(word = colnames(tmq6),freq=diag(tmq6))
+tmq6_temp <- tmq6_temp[order(-tmq6_temp$freq),]
+ggplot(tmq6_temp[1:20,], aes(x = reorder(word, -freq), y = freq)) + 
+  geom_bar(stat="identity") + 
+  coord_flip()+
+  xlab("Terme") + 
+  ylab("Fréquence") + 
+  theme_minimal()
+```
+
+
+```{r q6stat_nuagetopmots, echo=FALSE, warning=FALSE, fig.height = 8, fig.width = 8}
+g <- graph.adjacency(tmq6, weighted=T, mode = "undirected")
+g <- simplify(g)
+V(g)$label <- V(g)$name
+V(g)$degree <- degree(g)
+V(g)$label.cex <- 2.2 * V(g)$degree / max(V(g)$degree)+ .2
+V(g)$label.color <- rgb(0, 0, .2, .8)
+V(g)$frame.color <- NA
+egam <- (log(E(g)$weight)+.4) / max(log(E(g)$weight)+.4)
+E(g)$color <- rgb(.5, .5, 0, egam)
+E(g)$width <- egam
+layout1 <- layout.fruchterman.reingold(g)
+set.seed(3952)
+plot(g, layout=layout1, width = 500, height = 500)
+```
+
+## Analyse de mots dans la Q7
+
+```{r q7stat_topmots, echo=FALSE, warning=FALSE}
+vars2_value[7]
+tmq7_temp <- data.frame(word = colnames(tmq7),freq=diag(tmq7))
+tmq7_temp <- tmq7_temp[order(-tmq6_temp$freq),]
+ggplot(tmq7_temp[1:20,], aes(x = reorder(word, -freq), y = freq)) + 
+  geom_bar(stat="identity") + 
+  coord_flip()+
+  xlab("Terme") + 
+  ylab("Fréquence") + 
+  theme_minimal()
+```
+
+
+```{r q7stat_nuagetopmots, echo=FALSE, warning=FALSE, fig.height = 8, fig.width = 8}
+g <- graph.adjacency(tmq7, weighted=T, mode = "undirected")
+g <- simplify(g)
+V(g)$label <- V(g)$name
+V(g)$degree <- degree(g)
+V(g)$label.cex <- 2.2 * V(g)$degree / max(V(g)$degree)+ .2
+V(g)$label.color <- rgb(0, 0, .2, .8)
+V(g)$frame.color <- NA
+egam <- (log(E(g)$weight)+.4) / max(log(E(g)$weight)+.4)
+E(g)$color <- rgb(.5, .5, 0, egam)
+E(g)$width <- egam
+layout1 <- layout.fruchterman.reingold(g)
+set.seed(3952)
+plot(g, layout=layout1, width = 500, height = 500)
+```
+
+## Analyse de mots dans la Q8
+
+```{r q8stat_topmots, echo=FALSE, warning=FALSE}
+vars2_value[8]
+tmq8_temp <- data.frame(word = colnames(tmq8),freq=diag(tmq8))
+tmq8_temp <- tmq8_temp[order(-tmq8_temp$freq),]
+ggplot(tmq8_temp[1:20,], aes(x = reorder(word, -freq), y = freq)) + 
+  geom_bar(stat="identity") + 
+  coord_flip()+
+  xlab("Terme") + 
+  ylab("Fréquence") + 
+  theme_minimal()
+```
+
+
+```{r q8stat_nuagetopmots, echo=FALSE, warning=FALSE, fig.height = 8, fig.width = 8}
+g <- graph.adjacency(tmq8, weighted=T, mode = "undirected")
+g <- simplify(g)
+V(g)$label <- V(g)$name
+V(g)$degree <- degree(g)
+V(g)$label.cex <- 2.2 * V(g)$degree / max(V(g)$degree)+ .2
+V(g)$label.color <- rgb(0, 0, .2, .8)
+V(g)$frame.color <- NA
+egam <- (log(E(g)$weight)+.4) / max(log(E(g)$weight)+.4)
+E(g)$color <- rgb(.5, .5, 0, egam)
+E(g)$width <- egam
+layout1 <- layout.fruchterman.reingold(g)
+set.seed(3952)
+plot(g, layout=layout1, width = 500, height = 500)
+```
+
+
+## Analyse des réponses de la Q9
+
+```{r , echo=FALSE}
+dt <- data %>% count (Q9)
+dt$pct <- round(dt$n / sum(dt$n) * 100,2)
+kable(dt, caption = vars2_value[9])
+```
+
+## Analyse de mots dans la Q10
+
+```{r q10stat_topmots, echo=FALSE, warning=FALSE}
+vars2_value[10]
+tmq10_temp <- data.frame(word = colnames(tmq10),freq=diag(tmq10))
+tmq10_temp <- tmq10_temp[order(-tmq10_temp$freq),]
+ggplot(tmq10_temp[1:20,], aes(x = reorder(word, -freq), y = freq)) + 
+  geom_bar(stat="identity") + 
+  coord_flip()+
+  xlab("Terme") + 
+  ylab("Fréquence") + 
+  theme_minimal()
+```
+
+
+```{r q10stat_nuagetopmots, echo=FALSE, warning=FALSE, fig.height = 8, fig.width = 8}
+g <- graph.adjacency(tmq10, weighted=T, mode = "undirected")
+g <- simplify(g)
+V(g)$label <- V(g)$name
+V(g)$degree <- degree(g)
+V(g)$label.cex <- 2.2 * V(g)$degree / max(V(g)$degree)+ .2
+V(g)$label.color <- rgb(0, 0, .2, .8)
+V(g)$frame.color <- NA
+egam <- (log(E(g)$weight)+.4) / max(log(E(g)$weight)+.4)
+E(g)$color <- rgb(.5, .5, 0, egam)
+E(g)$width <- egam
+layout1 <- layout.fruchterman.reingold(g)
+set.seed(3952)
+plot(g, layout=layout1, width = 500, height = 500)
+```
+
+
+## Analyse des réponses de la Q11
+
+```{r , echo=FALSE}
+dt <- data %>% count (Q11)
+dt$pct <- round(dt$n / sum(dt$n) * 100,2)
+kable(dt, caption = vars2_value[11])
+```
+
+## Analyse de mots dans la Q12
+
+```{r q12stat_topmots, echo=FALSE, warning=FALSE}
+vars2_value[12]
+tmq12_temp <- data.frame(word = colnames(tmq12),freq=diag(tmq12))
+tmq12_temp <- tmq12_temp[order(-tmq12_temp$freq),]
+ggplot(tmq12_temp[1:20,], aes(x = reorder(word, -freq), y = freq)) + 
+  geom_bar(stat="identity") + 
+  coord_flip()+
+  xlab("Terme") + 
+  ylab("Fréquence") + 
+  theme_minimal()
+```
+
+
+```{r q12stat_nuagetopmots, echo=FALSE, warning=FALSE, fig.height = 8, fig.width = 8}
+g <- graph.adjacency(tmq12, weighted=T, mode = "undirected")
+g <- simplify(g)
+V(g)$label <- V(g)$name
+V(g)$degree <- degree(g)
+V(g)$label.cex <- 2.2 * V(g)$degree / max(V(g)$degree)+ .2
+V(g)$label.color <- rgb(0, 0, .2, .8)
+V(g)$frame.color <- NA
+egam <- (log(E(g)$weight)+.4) / max(log(E(g)$weight)+.4)
+E(g)$color <- rgb(.5, .5, 0, egam)
+E(g)$width <- egam
+layout1 <- layout.fruchterman.reingold(g)
+set.seed(3952)
+plot(g, layout=layout1, width = 500, height = 500)
+```
+
+## Analyse des réponses de la Q13
+```{r , echo=FALSE}
+vars2_value[11]
+```
+
+Les transports en commun
+
+```{r q13tc, echo=FALSE}
+dt <- data %>% count (Q13_TC)
+dt$pct <- round(dt$n / sum(dt$n) * 100,2)
+kable(dt)
+```
+
+Le covoiturage
+```{r q13co, echo=FALSE}
+dt <- data %>% count (Q13_CO)
+dt$pct <- round(dt$n / sum(dt$n) * 100,2)
+kable(dt)
+```
+
+L'auto partage
+```{r q13au, echo=FALSE}
+dt <- data %>% count (Q13_AU)
+dt$pct <- round(dt$n / sum(dt$n) * 100,2)
+kable(dt)
+```
+
+Le transport à la demande
+```{r q13od, echo=FALSE}
+dt <- data %>% count (Q13_OD)
+dt$pct <- round(dt$n / sum(dt$n) * 100,2)
+kable(dt)
+```
+
+Le vélo
+```{r q13ve, echo=FALSE}
+dt <- data %>% count (Q13_VE)
+dt$pct <- round(dt$n / sum(dt$n) * 100,2)
+kable(dt)
+```
+
+```{r q13ot, echo=FALSE}
+dt <- data %>% count (Q13_OT)
+dt$pct <- round(dt$n / sum(dt$n) * 100,2)
+kable(dt)
+```
+
+## Analyse de mots dans la Q14
+
+```{r q14stat_topmots, echo=FALSE, warning=FALSE}
+vars2_value[14]
+tmq14_temp <- data.frame(word = colnames(tmq14),freq=diag(tmq14))
+tmq14_temp <- tmq14_temp[order(-tmq14_temp$freq),]
+ggplot(tmq14_temp[1:20,], aes(x = reorder(word, -freq), y = freq)) + 
+  geom_bar(stat="identity") + 
+  coord_flip()+
+  xlab("Terme") + 
+  ylab("Fréquence") + 
+  theme_minimal()
+```
+
+
+```{r q14stat_nuagetopmots, echo=FALSE, warning=FALSE, fig.height = 8, fig.width = 8}
+g <- graph.adjacency(tmq14, weighted=T, mode = "undirected")
+g <- simplify(g)
+V(g)$label <- V(g)$name
+V(g)$degree <- degree(g)
+V(g)$label.cex <- 2.2 * V(g)$degree / max(V(g)$degree)+ .2
+V(g)$label.color <- rgb(0, 0, .2, .8)
+V(g)$frame.color <- NA
+egam <- (log(E(g)$weight)+.4) / max(log(E(g)$weight)+.4)
+E(g)$color <- rgb(.5, .5, 0, egam)
+E(g)$width <- egam
+layout1 <- layout.fruchterman.reingold(g)
+set.seed(3952)
+plot(g, layout=layout1, width = 500, height = 500)
+```
+
+## Analyse de mots dans la Q15
+
+```{r q15stat_topmots, echo=FALSE, warning=FALSE}
+vars2_value[15]
+tmq15_temp <- data.frame(word = colnames(tmq15),freq=diag(tmq15))
+tmq15_temp <- tmq15_temp[order(-tmq15_temp$freq),]
+ggplot(tmq15_temp[1:20,], aes(x = reorder(word, -freq), y = freq)) + 
+  geom_bar(stat="identity") + 
+  coord_flip()+
+  xlab("Terme") + 
+  ylab("Fréquence") + 
+  theme_minimal()
+```
+
+
+```{r q15stat_nuagetopmots, echo=FALSE, warning=FALSE, fig.height = 8, fig.width = 8}
+g <- graph.adjacency(tmq15, weighted=T, mode = "undirected")
+g <- simplify(g)
+V(g)$label <- V(g)$name
+V(g)$degree <- degree(g)
+V(g)$label.cex <- 2.2 * V(g)$degree / max(V(g)$degree)+ .2
+V(g)$label.color <- rgb(0, 0, .2, .8)
+V(g)$frame.color <- NA
+egam <- (log(E(g)$weight)+.4) / max(log(E(g)$weight)+.4)
+E(g)$color <- rgb(.5, .5, 0, egam)
+E(g)$width <- egam
+layout1 <- layout.fruchterman.reingold(g)
+set.seed(3952)
+plot(g, layout=layout1, width = 500, height = 500)
+```
+
+## Analyse de mots dans la Q16
+
+```{r q16stat_topmots, echo=FALSE, warning=FALSE}
+vars2_value[16]
+tmq16_temp <- data.frame(word = colnames(tmq16),freq=diag(tmq16))
+tmq16_temp <- tmq16_temp[order(-tmq16_temp$freq),]
+ggplot(tmq16_temp[1:20,], aes(x = reorder(word, -freq), y = freq)) + 
+  geom_bar(stat="identity") + 
+  coord_flip()+
+  xlab("Terme") + 
+  ylab("Fréquence") + 
+  theme_minimal()
+```
+
+
+```{r q16stat_nuagetopmots, echo=FALSE, warning=FALSE, fig.height = 8, fig.width = 8}
+g <- graph.adjacency(tmq16, weighted=T, mode = "undirected")
+g <- simplify(g)
+V(g)$label <- V(g)$name
+V(g)$degree <- degree(g)
+V(g)$label.cex <- 2.2 * V(g)$degree / max(V(g)$degree)+ .2
+V(g)$label.color <- rgb(0, 0, .2, .8)
+V(g)$frame.color <- NA
+egam <- (log(E(g)$weight)+.4) / max(log(E(g)$weight)+.4)
+E(g)$color <- rgb(.5, .5, 0, egam)
+E(g)$width <- egam
+layout1 <- layout.fruchterman.reingold(g)
+set.seed(3952)
+plot(g, layout=layout1, width = 500, height = 500)
+```
+
