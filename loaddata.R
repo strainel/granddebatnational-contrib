@@ -12,6 +12,8 @@ require(tm, quietly = T)
 require(arules)
 
 # Lecture du fichier des contributions
+# A télécharger depuis le site d ugrand debat (données ouvertes)
+# http://opendata.auth-6f31f706db6f4a24b55f42a6a79c5086.storage.sbg5.cloud.ovh.net/2019-02-17/LA_TRANSITION_ECOLOGIQUE.csv
 file <- "data/LA_TRANSITION_ECOLOGIQUE.csv"
 pre <- fread(file, sep = ",", header= TRUE, encoding = 'UTF-8', colClasses = 'character')
 
