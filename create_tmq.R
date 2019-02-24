@@ -38,6 +38,7 @@ myTM <- function (d, v, sparsetx = 0.98, maxword = 40, qtx= .8) {
     tm_map(content_transformer(function(x) gsub(x, pattern = "ecologique", replacement = "écologie")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "écologiques", replacement = "écologie")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "politiques", replacement = "politique")))%>%
+    tm_map(content_transformer(function(x) gsub(x, pattern = "canicules", replacement = "canicule")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "kerosene", replacement = "kérosène")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "kerozene", replacement = "kérosène")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "croisières", replacement = "croisière")))%>%
@@ -64,6 +65,8 @@ myTM <- function (d, v, sparsetx = 0.98, maxword = 40, qtx= .8) {
     tm_map(content_transformer(function(x) gsub(x, pattern = "véhicules", replacement = "véhicule")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "voitures", replacement = "véhicule")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "voiture", replacement = "véhicule")))%>%
+    tm_map(content_transformer(function(x) gsub(x, pattern = "trains", replacement = "train")))%>%
+    tm_map(content_transformer(function(x) gsub(x, pattern = "vélos", replacement = "vélo")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "polluantes", replacement = "pollution")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "polluants", replacement = "pollution")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "pollutions", replacement = "pollution")))%>%
@@ -130,7 +133,7 @@ myTM <- function (d, v, sparsetx = 0.98, maxword = 40, qtx= .8) {
 tmq1 <- myTM(data, data$Q1, sparsetx = 0.997)
 tmq2 <- myTM(data, data$Q2)
 tmq4 <- myTM(data, data$Q4, sparsetx = 0.996)
-tmq6 <- myTM(data, data$Q6, maxword = 25, qtx = .6)
+tmq6 <- myTM(data, data$Q6)
 tmq7 <- myTM(data, data$Q7)
 tmq8 <- myTM(data, data$Q8, sparsetx = 0.996)
 tmq10 <- myTM(data, data$Q10, sparsetx = 0.996)
