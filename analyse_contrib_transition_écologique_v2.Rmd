@@ -1,15 +1,14 @@
 ---
 title: "Analyse des contributions du Grand Débat National sur la transition écologique"
 author: ""
-date: "21 février 2019"
+date: "24 février 2019"
 output: 
   html_document:
     theme: cosmo
 ---
 
 ```{r setup, include=FALSE,  message=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-knitr::opts_chunk$set(comment = NA)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, comment = NA)
 require(knitr)
 require(dplyr)
 require(metricsgraphics)
@@ -27,7 +26,8 @@ require(cartography)
 ```{r loadata, echo=FALSE, cache= FALSE,  message=FALSE}
 setwd("C:/Users/stephane.trainel/Documents/Developpements/granddebat-contrib/")
 #source("loaddata.R", encoding = "UTF-8")
-load(file = "data2.Rdata")
+load(file = "data.Rdata")
+load(file = "data_tmq.Rdata")
 load(file = "dep.Rdata")
 ```
 
@@ -42,18 +42,16 @@ as.numeric(count(data))
 ```{r nbtypeauthor, echo=FALSE}
 dt <- data %>% count (authorType)
 dt$pct <- round(dt$n / sum(dt$n) * 100,2)
-kable(dt, caption = "Type de contributeur")
+kable(dt, caption = "Type de contributeur", col.names = c("Type d'auteur","Nb","Pct"))
 ```
 
-```{r nbdep, echo=FALSE, fig.height = 8, fig.width = 8}
-dt <- data %>% count (dep)
-dt$pct <- round(dt$n / sum(dt$n) * 100,2)
+```{r nbdep, echo=FALSE, cache= FALSE,  message=FALSE, fig.height = 8, fig.width = 8}
+dt <- data %>% count (DEP) %>% inner_join(stats, by="DEP") %>% mutate(dens = 10000 * n / NBHAB2019)
 plot(dep)
 choroLayer(spdf = dep, df = dt, spdfid = "CODE_DEPT", 
-           dfid = "dep", var = "n", border = NA, 
+           dfid = "DEP", var = "dens", border = NA, 
            col = carto.pal("wine.pal", 6), legend.pos = "topleft", 
-           add = TRUE, method = "geom", nclass = 6, legend.title.txt = "Contribution par département")
-
+           add = TRUE, method = "geom", nclass = 6, legend.title.txt = "Nombre de contributions pour 10 000 habitants")
 ```
 
 ## Analyse de mots dans la Q1
@@ -61,7 +59,7 @@ choroLayer(spdf = dep, df = dt, spdfid = "CODE_DEPT",
 ```{r q1stat, echo=FALSE}
 dt <- data %>% count (Q1F)
 dt$pct <- round(dt$n / sum(dt$n) * 100,2)
-kable(dt, caption = vars2_value[1])
+kable(dt, caption = vars2_value[1], col.names = c("Réponse","Nb","Pct"))
 ```
 
 ```{r q1stat_topmots, echo=FALSE, warning=FALSE}
@@ -129,7 +127,7 @@ plot(g, layout=layout1, width = 500, height = 500)
 ```{r , echo=FALSE}
 dt <- data %>% count (Q3)
 dt$pct <- round(dt$n / sum(dt$n) * 100,2)
-kable(dt, caption = vars2_value[3])
+kable(dt, caption = vars2_value[3], col.names = c("Réponse","Nb","Pct"))
 ```
 
 ## Analyse de mots dans la Q4
@@ -170,7 +168,7 @@ plot(g, layout=layout1, width = 500, height = 500)
 ```{r , echo=FALSE}
 dt <- data %>% count (Q5)
 dt$pct <- round(dt$n / sum(dt$n) * 100,2)
-kable(dt, caption = vars2_value[5])
+kable(dt, caption = vars2_value[5], col.names = c("Réponse","Nb","Pct"))
 ```
 
 
@@ -273,7 +271,7 @@ plot(g, layout=layout1, width = 500, height = 500)
 ```{r , echo=FALSE}
 dt <- data %>% count (Q9)
 dt$pct <- round(dt$n / sum(dt$n) * 100,2)
-kable(dt, caption = vars2_value[9])
+kable(dt, caption = vars2_value[9], col.names = c("Réponse","Nb","Pct"))
 ```
 
 ## Analyse de mots dans la Q10
@@ -313,7 +311,7 @@ plot(g, layout=layout1, width = 500, height = 500)
 ```{r , echo=FALSE}
 dt <- data %>% count (Q11)
 dt$pct <- round(dt$n / sum(dt$n) * 100,2)
-kable(dt, caption = vars2_value[11])
+kable(dt, caption = vars2_value[11], col.names = c("Réponse","Nb","Pct"))
 ```
 
 ## Analyse de mots dans la Q12

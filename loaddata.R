@@ -11,25 +11,36 @@ require(data.table, quietly = T)
 require(tm, quietly = T)
 require(arules)
 
-# Lecture du fichier
+# Lecture du fichier des contributions
 file <- "data/LA_TRANSITION_ECOLOGIQUE.csv"
-pre <- fread(file, sep = ",", header= TRUE, encoding = 'UTF-8')
+pre <- fread(file, sep = ",", header= TRUE, encoding = 'UTF-8', colClasses = 'character')
+
+# Lecture de statistiques
+file <- "data/stats_dep.csv"
+stats <- fread(file, sep = ";", header= TRUE, encoding = 'UTF-8')
 
 # Renommage des colonnes
-vars <- c("reference","title","createdAt","publishedAt","updatedAt","trashed","trashedStatus","authorId","authorType","authorZipCode")
+vars <- c("id","reference","title","createdAt","publishedAt","updatedAt","trashed","trashedStatus","authorId","authorType","authorZipCode")
 vars2_value <- setdiff(names(pre),vars)
 vars2 <- paste('Q', 1:16, sep='')
 names(pre) <- c(vars, vars2)
+
+# Suppression des réponses en doublon
+rang <- which(duplicated(data))
+pre <- pre[-rang,]
 
 # Mise au format date
 pre$createdAt <- as.POSIXct(pre$createdAt, format="%Y-%m-%d %H:%M:%S")
 pre$publishedAt <- as.POSIXct(pre$publishedAt, format="%Y-%m-%d %H:%M:%S")
 pre$updatedAt <- as.POSIXct(pre$updatedAt, format="%Y-%m-%d %H:%M:%S")
 
-pre$authorZipCode[pre$authorZipCode >= 99000] <- NA
+pre$authorZipCode[nchar(pre$authorZipCode)!= 5] <- NA
 pre$authorZipCode[pre$authorZipCode <= 0] <- NA
-pre$authorZipCode <- sprintf("%05d",as.numeric(pre$authorZipCode))
-pre$dep <- substr(pre$authorZipCode, 0, 2)
+pre$authorZipCode[pre$authorZipCode == "00000"] <- NA
+pre$authorZipCode[pre$authorZipCode <= "01000"] <- NA
+pre$authorZipCode[pre$authorZipCode == "99999"] <- NA
+
+pre$DEP <- substr(pre$authorZipCode, 0, 2)
 
 pre <- pre %>%
   mutate(Q1F = case_when(Q1 == "La pollution de l'air"~ Q1,
@@ -61,5 +72,6 @@ pre <- pre %>%
 
 data <- pre
 
+save(vars2_value, data, stats, file="data.Rdata")
 source("create_tmq.R", encoding = "UTF-8")
 

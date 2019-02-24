@@ -25,7 +25,13 @@ myTM <- function (d, v, sparsetx = 0.98, maxword = 40, qtx= .8) {
     tm_map(stripWhitespace) %>%
     tm_map(removeNumbers)%>%
     tm_map(removePunctuation)%>%
-    tm_map(removeWords, c("ainsi","grand","grande","grands","etre","surtous","déjà","ceux","ans","mode","quand","huit","faire","fais","manière","notamment","nombre","car","alors","donc","dont","etc","afin","aussi","comme","chaque","prendre","mettre","être","place","vers","avoir","peut","faut","faudrait","fait","falloir","doivent","doit","autre","autres","niveau")) %>%
+    tm_map(removeWords, c("ainsi","afin","alors","ans","avoir","aussi","autre","autres","car","ceux","chaque","comme",
+                          "déjà","donc","dont","etc","doivent","doit","entre","etre","être",
+                          "faut","faudrait","fait","falloir","faire","fais",
+                          "grand","grande","grands","huit",
+                          "mettre","mode","manière","notamment","nombre","niveau",
+                          "prendre","place","peut","points","quand",
+                          "surtous","vers")) %>%
     tm_map(removeWords, stopwords("french")) %>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "ecologie", replacement = "écologie")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "écologique", replacement = "écologie")))%>%
@@ -60,6 +66,7 @@ myTM <- function (d, v, sparsetx = 0.98, maxword = 40, qtx= .8) {
     tm_map(content_transformer(function(x) gsub(x, pattern = "voiture", replacement = "véhicule")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "polluantes", replacement = "pollution")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "polluants", replacement = "pollution")))%>%
+    tm_map(content_transformer(function(x) gsub(x, pattern = "pollutions", replacement = "pollution")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "polluent", replacement = "pollueurs")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "électriques", replacement = "électrique")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "gens", replacement = "particuliers")))%>%
@@ -133,7 +140,7 @@ tmq15 <- myTM(data, data$Q15)
 tmq16 <- myTM(data, data$Q16)
 
 
-save(vars2_value, data, tmq1,tmq2,tmq4,tmq6,tmq7,tmq8,tmq10,tmq12,tmq14,tmq15,tmq16, file="data2.Rdata")
+save(tmq1,tmq2,tmq4,tmq6,tmq7,tmq8,tmq10,tmq12,tmq14,tmq15,tmq16, file="data_tmq.Rdata")
 # load(file = "data2.Rdata")
 
 
