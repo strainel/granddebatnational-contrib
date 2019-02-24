@@ -59,6 +59,8 @@ myTM <- function (d, v, sparsetx = 0.98, maxword = 40, qtx= .8) {
     tm_map(content_transformer(function(x) gsub(x, pattern = "toute", replacement = "tous")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "tout", replacement = "tous")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "solutions", replacement = "solution")))%>%
+    tm_map(content_transformer(function(x) gsub(x, pattern = "sécheresses", replacement = "sécheresse")))%>%
+    tm_map(content_transformer(function(x) gsub(x, pattern = "températures", replacement = "température")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "énergies", replacement = "énergie")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "villes", replacement = "ville")))%>%
     tm_map(content_transformer(function(x) gsub(x, pattern = "modes", replacement = "mode")))%>%
