@@ -127,7 +127,7 @@ myTM <- function (d, v, sparsetx = 0.98, maxword = 40, qtx= .8) {
 
 #tmq_test <- myTM(data[1:1000,], data[1:1000,]$Q1)
 
-tmq1 <- myTM(data, data$Q1, sparsetx = 0.996)
+tmq1 <- myTM(data, data$Q1, sparsetx = 0.997)
 tmq2 <- myTM(data, data$Q2)
 tmq4 <- myTM(data, data$Q4, sparsetx = 0.996)
 tmq6 <- myTM(data, data$Q6, maxword = 25, qtx = .6)
